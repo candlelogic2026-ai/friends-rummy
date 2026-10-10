@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Friends Rummy Online</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#07131d;color:#eef7f3;font-family:system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:960px;margin:auto;padding:14px}.panel{background:#10232e;border:1px solid #25414d;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 10px 30px #0003}h1,h2,h3{margin:4px 0 12px}.muted{color:#9bb0b8}.row{display:flex;gap:9px;flex-wrap:wrap}.grow{flex:1;min-width:0}input,select,button{width:100%;padding:12px;border-radius:12px;border:1px solid #385461;background:#091a24;color:#fff;font-size:16px}button{background:#1f8f68;border:0;font-weight:750;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#24404d}.danger{background:#b94343}.hidden{display:none!important}.roomcode{font-size:clamp(26px,7vw,34px);font-weight:900;letter-spacing:7px;text-align:center;color:#7ee2bb}.players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.player{padding:10px;border-radius:12px;background:#0a1b25;border:1px solid #29434d}.table{background:#0b402f;border-radius:22px;padding:12px;border:6px solid #173d36;min-height:290px}.opponents{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.opp{text-align:center;overflow:hidden}.backs{display:flex;justify-content:center;overflow:hidden}.back{width:23px;height:37px;flex:0 0 23px;border-radius:4px;background:repeating-linear-gradient(45deg,#244f8c 0 4px,#d9e8f8 4px 6px);border:2px double #fff;margin-left:-8px}.center{text-align:center;margin:13px 0}.pile-row{display:flex;justify-content:center;align-items:flex-end;gap:24px}.pile-box{display:flex;flex-direction:column;align-items:center;gap:5px}.deck-back{width:58px;height:82px;border-radius:7px;background:repeating-linear-gradient(45deg,#244f8c 0 4px,#d9e8f8 4px 6px);border:3px double #fff;box-shadow:0 2px 4px #0005;display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px}.discard{width:58px;height:82px}.hand{display:flex;gap:5px;overflow-x:auto;padding:12px 2px 16px;align-items:flex-end;min-height:104px}.hand-group{display:flex;gap:3px;padding:5px 4px;border:1px dashed #477566;border-radius:9px;flex:0 0 auto;align-items:flex-end;background:#0b3027}.cardface.gsel{outline:3px solid #f5c451;transform:translateY(-5px)}.group-tools{display:flex;gap:7px;flex-wrap:wrap;margin:6px 0 10px}.group-tools button{width:auto;flex:1;min-width:105px;font-size:13px;padding:9px}.cardface{position:relative;flex:0 0 55px;height:82px;background:linear-gradient(135deg,#fff 0%,#fff 78%,#f3f3f3 100%);color:#151515;border-radius:7px;border:1px solid #d2d7dd;box-shadow:0 2px 4px #0004;cursor:pointer;line-height:1;overflow:hidden;user-select:none}.cardface.red{color:#d71936}.cardface.sel{border:3px solid #20d49b;transform:translateY(-6px);box-shadow:0 4px 10px #0005}.corner{position:absolute;top:4px;left:5px;display:flex;flex-direction:column;align-items:center;font-weight:900;font-size:14px;line-height:.94;z-index:2}.corner.bottom{top:auto;left:auto;right:5px;bottom:4px;transform:rotate(180deg)}.corner .corner-suit{font-size:13px;margin-top:2px}.pipfield{position:absolute;inset:7px 5px;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:repeat(4,1fr);align-items:center;justify-items:center;padding:10px 0 8px}.pip{font-size:15px;line-height:1;font-weight:800}.pip.flip{transform:rotate(180deg)}.face-art{position:absolute;inset:18px 7px 17px;border:2px solid currentColor;border-radius:5px;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(135deg,#fff8 0 5px,#e8e8e8 5px 8px);font-size:26px;font-weight:1000;letter-spacing:-2px}.face-art:before,.face-art:after{content:"";position:absolute;width:17px;height:17px;border:2px solid currentColor;transform:rotate(45deg);opacity:.8}.face-art:before{top:5px;left:5px}.face-art:after{bottom:5px;right:5px}.face-art span{background:#fff;padding:2px 3px;z-index:1}.status{padding:10px;border-radius:12px;background:#0b1b25;overflow-wrap:anywhere}.wild-indicator{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:#103b30;border:1px solid #3c846d;border-radius:12px;padding:8px;margin:8px 0 12px;font-weight:800}.wild-card-mini{width:42px;height:58px;flex:0 0 42px;position:relative;background:#fff;color:#111;border:2px solid #f5c451;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px #0005}.wild-card-mini.red{color:#d71936}.joker-face{position:relative;flex:0 0 55px;height:82px;background:linear-gradient(135deg,#fff,#f5f0ff);color:#24213d;border:2px solid #6c55a3;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-weight:1000;box-shadow:0 2px 4px #0004}.joker-face .joker-star{font-size:25px;line-height:1;color:#d71936}.joker-face small{font-size:10px;letter-spacing:.4px}@media(max-width:560px){.joker-face{flex-basis:47px;height:76px}}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#000e;padding:12px 18px;border-radius:12px;display:none;z-index:20;max-width:92vw}.help{font-size:13px;line-height:1.45}.statusline{display:flex;gap:10px;align-items:center;justify-content:space-between}.statusline button{width:auto;padding:9px 12px}@media(max-width:560px){.wrap{padding:8px}.panel{padding:12px}.opponents{grid-template-columns:repeat(2,minmax(0,1fr))}.cardface{flex-basis:47px;height:76px}.corner{font-size:12px}.pip{font-size:13px}.deck-back{width:52px;height:76px}.discard{width:52px;height:76px}.roomcode{letter-spacing:5px}}
+
+/* Oval felt table redesign inspired by the supplied reference */
+body{background:#11151a;background-image:radial-gradient(ellipse at 50% 35%,#2b3036 0,#11151a 70%);}
+.wrap{max-width:1100px;padding:10px}.panel{background:#121e25;border-color:#31424b}
+#game>.panel:first-child{margin:5px 0 9px;padding:10px 14px;border-radius:13px}
+.oval-table{position:relative;isolation:isolate;min-height:470px;padding:16px 18px 14px;border-radius:50% / 29%;border:9px solid #5b6064;outline:2px solid #aab0b3;box-shadow:inset 0 0 0 4px #141a1f,inset 0 0 55px #0009,0 10px 24px #0008;background:radial-gradient(ellipse at 50% 45%,#a60d14 0%,#81070c 57%,#4b070a 100%);overflow:hidden}
+.oval-table:before{content:"";position:absolute;inset:13px;border:2px solid #b8a7a7;border-radius:50% / 29%;opacity:.42;pointer-events:none;z-index:-1}
+.table-brand{text-align:center;font-weight:1000;letter-spacing:2px;color:#f5e9e9;font-size:clamp(14px,2.6vw,22px);text-shadow:0 2px 3px #000;margin:0 0 6px}.table-brand b{color:#ff414a}.table-brand span{padding:0 7px;color:#ffd9d9}
+.seat-ring{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,1.35fr) minmax(0,1fr);grid-template-rows:76px minmax(180px,1fr) 62px;grid-template-areas:"tl tc tr" "ml center mr" ". self .";gap:5px 9px;align-items:center;min-height:365px}
+.opponents{display:contents}.opp{min-width:0;max-width:100%;padding:6px 4px;text-align:center;color:#fff;background:linear-gradient(180deg,#292c2dce,#0e1417e8);border:1px solid #82898c;border-radius:10px;box-shadow:0 3px 5px #0008;font-size:12px}.opp:nth-child(1){grid-area:tl}.opp:nth-child(2){grid-area:tc}.opp:nth-child(3){grid-area:tr}.opp:nth-child(4){grid-area:ml}.opp:nth-child(5){grid-area:mr}.opp b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.backs{height:22px;margin-top:3px;justify-content:center;overflow:hidden}.back{width:14px;height:22px;flex-basis:14px;margin-left:-5px;border-radius:3px;background:repeating-linear-gradient(45deg,#283b68 0 3px,#e6eaf0 3px 4px);border:1px solid #e6eaf0}
+.table-center{grid-area:center;min-width:0;align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px}.wild-indicator{margin:0;padding:6px 9px;gap:7px;background:#220b0dba;border-color:#d76b70;color:#fff;font-size:12px;border-radius:9px}.wild-card-mini{width:37px;height:49px;flex-basis:37px;font-size:18px}.joker-open-row{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap}.joker-open{display:inline-flex;align-items:center;gap:3px;padding:4px 7px;border-radius:6px;background:#fff;color:#29202b;border:1px solid #e0d4e2;font-size:10px;box-shadow:0 2px 3px #0005}.joker-open:first-child{color:#b20b20}.joker-open:nth-child(2){color:#29202b}.wild-caption{font-size:9px;color:#ffe0e0;text-align:center;width:100%}.pile-row{gap:14px;align-items:center;margin:0}.pile-box{gap:4px}.pile-label{font-size:9px;font-weight:900;letter-spacing:.6px;color:#f4dddd}.deck-back{width:51px;height:73px;flex-basis:51px;border-radius:6px;background:repeating-linear-gradient(45deg,#263a67 0 4px,#f0f2f5 4px 5px);border:2px solid #f5f5f5;box-shadow:0 3px 6px #0008;cursor:pointer}.discard{width:51px;height:73px;flex-basis:51px}.discard .cardface,.discard .joker-face{width:100%;height:100%;min-width:0}.discard-pick{padding:0;display:flex;align-items:center;justify-content:center;background:transparent;border:0;width:51px;height:73px;cursor:pointer}.discard-pick:disabled{opacity:.45}.group-feedback{font-size:20px;font-weight:1000;text-align:center;min-height:28px;padding:3px 8px;border-radius:8px;color:#d8e4e7}.group-feedback.valid{background:#0b4a2c;color:#62ff9a}.group-feedback.invalid{background:#5c1117;color:#ff6573}.history-btn{width:auto;font-size:10px;padding:5px 7px;border-radius:7px;white-space:nowrap}.self-seat{grid-area:self;justify-self:center;display:flex;align-items:center;gap:8px;max-width:95%;padding:7px 15px;background:linear-gradient(180deg,#2c3031,#111719);border:2px solid #20d77b;border-radius:30px;color:#fff;box-shadow:0 0 0 3px #0006;font-weight:800;font-size:12px}.self-dot{color:#26ef80;font-size:16px}.self-seat small{font-size:10px;color:#c5d0d2;font-weight:500}.status{width:100%;font-size:11px;padding:6px 8px;text-align:center;background:#210b0dbf;border:1px solid #6e3034;border-radius:7px}
+#game>.panel:nth-last-child(2){margin-top:9px}.hand{min-height:108px;gap:4px;padding:12px 2px 14px;scrollbar-width:thin;scrollbar-color:#7d7777 #241d1e}.hand-group{background:#2a1114;border:1px dashed #f0a7a7;border-radius:7px;padding:4px 3px;gap:2px}.cardface{flex-basis:51px;height:77px;border-radius:5px}.corner{font-size:12px}.corner .corner-suit{font-size:12px}.pip{font-size:13px}.face-art{font-size:23px}.group-tools button{font-size:12px;min-width:115px;padding:9px}.row button{border-radius:9px}.statusline{background:#151d22}
+@media(min-width:760px){.oval-table{min-height:500px}.seat-ring{grid-template-rows:82px minmax(205px,1fr) 65px;min-height:390px}.cardface{flex-basis:55px;height:82px}.deck-back{width:58px;height:82px;flex-basis:58px}.discard{width:58px;height:82px}}
+@media(max-width:560px){.discard-pick{width:47px;height:68px}.wrap{padding:5px}.oval-table{padding:12px 8px 9px;border-width:5px;border-radius:46% / 14%;min-height:405px}.oval-table:before{inset:7px;border-radius:46% / 14%}.table-brand{letter-spacing:1px;margin-bottom:4px}.seat-ring{grid-template-columns:minmax(0,1fr) minmax(116px,1.15fr) minmax(0,1fr);grid-template-rows:61px minmax(190px,1fr) 49px;gap:4px 3px;min-height:350px}.opp{padding:4px 2px;font-size:10px;border-radius:7px}.opp b{font-size:10px}.backs{height:18px}.back{width:11px;height:18px;flex-basis:11px;margin-left:-4px}.table-center{gap:5px}.wild-indicator{font-size:10px;padding:5px 4px;gap:4px}.wild-card-mini{width:31px;height:43px;flex-basis:31px;font-size:15px}.joker-open{font-size:8px;padding:3px 5px}.wild-caption{font-size:8px}.pile-row{gap:8px}.pile-label{font-size:8px}.deck-back{width:43px;height:63px;flex-basis:43px;font-size:22px}.discard{width:43px;height:63px;flex-basis:43px}.history-btn{font-size:9px;padding:5px}.self-seat{font-size:10px;padding:5px 10px;gap:5px}.self-seat small{font-size:9px}.status{font-size:10px;padding:5px}.cardface{flex-basis:47px;height:72px}.joker-face{flex-basis:47px;height:72px}.group-tools{gap:5px}.group-tools button{min-width:calc(50% - 5px);font-size:11px;padding:8px}.hand{gap:4px}.panel{padding:10px}}
+
+
+/* Mobile table readability fix: force clean felt and reserve enough room for the centre piles */
+.oval-table{
+  background-color:#81070c!important;
+  background-image:radial-gradient(ellipse at 50% 42%,#a9141b 0%,#85090f 58%,#4b070a 100%)!important;
+  background-repeat:no-repeat!important;
+  background-size:100% 100%!important;
+}
+.oval-table:before{
+  content:"";
+  position:absolute;
+  inset:13px;
+  border:2px solid #b8a7a7;
+  border-radius:50% / 29%;
+  background:transparent!important;
+  background-image:none!important;
+  opacity:.42;
+  pointer-events:none;
+  z-index:0;
+}
+.oval-table>.table-brand,.oval-table>.seat-ring{position:relative;z-index:1}
+@media(max-width:560px){
+  .oval-table{
+    min-height:470px;
+    padding:12px 7px 10px;
+    border-width:5px;
+    border-radius:46% / 14%;
+    overflow:hidden;
+  }
+  .oval-table:before{inset:7px;border-radius:46% / 14%}
+  .table-brand{font-size:15px;letter-spacing:1px;margin-bottom:5px}
+  .seat-ring{
+    grid-template-columns:minmax(0,.72fr) minmax(0,1.7fr) minmax(0,.72fr);
+    grid-template-rows:62px minmax(285px,1fr) 48px;
+    grid-template-areas:"tl tc tr" "ml center mr" ". self .";
+    gap:4px 3px;
+    min-height:395px;
+  }
+  .opp{padding:4px 2px;font-size:10px;min-width:0}
+  .opp b{font-size:10px}
+  .backs{height:18px}
+  .back{width:9px;height:16px;flex-basis:9px;margin-left:-4px}
+  .table-center{gap:8px;min-width:0;width:100%}
+  .wild-indicator{width:100%;font-size:10px;padding:6px 3px;gap:4px;line-height:1.25}
+  .wild-card-mini{width:31px;height:43px;flex-basis:31px;font-size:15px}
+  .joker-open-row{gap:4px}
+  .joker-open{font-size:9px;padding:4px 5px}
+  .wild-caption{font-size:8px;line-height:1.2}
+  .pile-row{gap:12px;width:100%;justify-content:center}
+  .pile-box{min-width:0}
+  .pile-label{font-size:9px;letter-spacing:0}
+  .deck-back,.discard{width:47px;height:68px;flex-basis:47px}
+  .history-btn{font-size:9px;padding:6px 5px}
+  .status{font-size:10px;padding:6px 4px;line-height:1.25}
+  .self-seat{font-size:10px;padding:5px 8px;gap:5px;white-space:nowrap}
+  .self-seat small{font-size:9px}
+}
+
+</style>
+</head>
+<body><main class="wrap">
+<section id="home" class="panel">
+<h1>🃏 Friends Rummy</h1><p class="muted">Free-to-play private rooms. 2 to 6 friends.</p>
+<label for="name">Player name</label><input id="name" placeholder="Your player name" maxlength="20" autocomplete="nickname">
+<label for="mode" style="display:block;margin-top:10px">Game mode</label><select id="mode"><option value="201_points">201 Points</option><option value="hand_to_hand">Hand-to-Hand</option><option value="single_table">Single Table</option></select>
+<div class="row" style="margin-top:10px"><button class="grow" id="createBtn" onclick="createRoom()">Create Room</button><button class="grow secondary" onclick="showJoin()">Join Room</button></div>
+<div id="joinBox" class="hidden" style="margin-top:10px"><label for="code">Room code</label><input id="code" placeholder="6-character room code" maxlength="6" style="text-transform:uppercase"><button onclick="joinRoom()" style="margin-top:8px">Join Room</button></div>
+<p class="muted help">Refresh returns to this home screen. To return to a room, enter its code again.</p>
+</section>
+<section id="lobby" class="panel hidden">
+<h2>Waiting Room</h2><div class="roomcode" id="roomCode"></div><button onclick="shareRoom()" style="margin:10px 0">📲 Share on WhatsApp</button>
+<div class="players" id="players"></div><div id="hostStart" class="hidden" style="margin-top:12px"><button id="startBtn" onclick="startGame()">Start Game</button></div>
+<p class="muted">Minimum 2 players. Maximum 6.</p>
+</section>
+<section id="game" class="hidden">
+<div class="panel statusline"><b id="turnText">Connecting…</b><button class="secondary" onclick="leaveRoom()">Leave</button></div>
+<div class="table oval-table">
+  <div class="table-brand"><span>♠</span> FRIENDS <b>RUMMY</b> <span>♥</span></div>
+  <div class="seat-ring">
+    <div class="opponents" id="opponents"></div>
+    <div class="table-center">
+      <div id="wildIndicator" class="wild-indicator">Random wild card: waiting for round…</div>
+      <div class="joker-open-row"><span class="joker-open">★ <b>JOKER</b></span><span class="joker-open">★ <b>JOKER</b></span><span class="wild-caption">2 Jokers + all cards of the random wild rank</span></div>
+      <div class="pile-row">
+        <div class="pile-box"><div class="pile-label">DRAW DECK</div><button id="deckClick" class="deck-back" aria-label="Draw a card from the deck" onclick="drawCard()">🂠</button></div>
+        <div class="pile-box"><div class="pile-label">DISCARD PILE</div><button id="discardTop" class="discard discard-pick" aria-label="Take the top discard card" onclick="takeDiscard()"></button><button class="secondary history-btn" onclick="showHistory()">Discard history</button></div>
+      </div>
+      <div id="gameStatus" class="status">Ready</div><div id="groupFeedback" class="group-feedback" aria-live="polite">Select 3 cards to check a group</div>
+    </div>
+    <div class="self-seat" id="selfSeat"><span class="self-dot">●</span><span id="selfName">You</span><small id="selfCount">13 cards</small></div>
+  </div>
+</div>
+<div class="panel"><h3>Your hand <span id="count">(0)</span></h3><div id="hand" class="hand"></div><div class="group-tools"><button class="secondary" id="groupModeBtn" onclick="toggleGroupMode()">Select cards to group</button><button class="secondary" onclick="groupSelected()">Group selected (3+)</button><button class="secondary" onclick="ungroupSelected()">Ungroup selected</button><button class="secondary" onclick="autoArrange()">Sort hand</button></div>
+<div class="row" style="margin-top:8px"><button class="grow" id="discardBtn" onclick="discardSelected()">Discard Selected</button><button class="grow danger" id="dropBtn" onclick="dropGame()">Drop 25</button><button class="grow" id="declareBtn" onclick="declareGame()">Declare</button></div>
+<p class="muted help">Deck: 104 standard cards + 2 printed Jokers. One random standard card sets the wild rank; both printed Jokers and every card of that rank are wild. Draw to 14 cards, then discard one.</p></div>
+<div class="panel"><h3>Scores</h3><div id="scores"></div></div>
+</section></main><div id="toast" class="toast" role="status"></div>
+<script>
+const SUPABASE_URL='https://pburscyfhjpwtehfpvap.supabase.co';
+const SUPABASE_KEY='sb_publishable_YAaKOGT8nW1z8uPK-jDquA_HYhFQyH-';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const FN='rummy-game';const $=id=>document.getElementById(id);
+let session=null,user=null,room=null,members=[],state=null,myHand=[],selected=null,channel=null,pollTimer=null,busy=false,discardHistory=[],actionBusy=false,groupMode=false,groupSelection=new Set(),visualGroups=[];
+function toast(s){$('toast').textContent=String(s);$('toast').style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').style.display='none',3200)}
+async function init(){try{let x=await sb.auth.getSession();if(x.error)throw x.error;session=x.data.session;if(!session){let a=await sb.auth.signInAnonymously();if(a.error)throw a.error;session=a.data.session}user=session.user;await sb.realtime.setAuth(session.access_token)}catch(e){toast('Connection error: '+(e.message||e));console.error(e)}}
+async function api(action,extra={}){if(!user)throw Error('Connecting to server. Wait a moment and try again.');const body={action};for(const k of ['display_name','displayName'])if(extra[k]!==undefined){body.displayName=extra[k];break}if(extra.mode!==undefined)body.mode=extra.mode;for(const k of ['max_players','maxPlayers'])if(extra[k]!==undefined){body.maxPlayers=extra[k];break}if(extra.code!==undefined)body.code=extra.code;for(const k of ['room_id','roomId'])if(extra[k]!==undefined){body.roomId=extra[k];break}if(extra.cardId!==undefined)body.cardId=extra.cardId;if(extra.card_index!==undefined){let c=myHand[extra.card_index];if(!c)throw Error('Select a card first.');body.cardId=c.id}
+const res=await sb.functions.invoke(FN,{body});if(res.error){let msg=res.error.message||'Could not contact game server';try{const ctx=res.error.context;if(ctx&&typeof ctx.clone==='function'){const payload=await ctx.clone().json();msg=payload.error||payload.message||msg}}catch{}throw Error(msg)}const raw=res.data||{};if(raw.ok===false||raw.error)throw Error(raw.error||'Request failed');const x=raw.state||raw;return{room:x.room,members:x.members||[],scores:x.scores||[],hand:x.hand||[],hand_counts:x.handCounts||{},valid:raw.result?.valid,result:raw.result,state:{discard_pile:x.discardPile||[],wild_rank:x.wildRank||null,wild_card:x.wildCard||null,turn_user_id:x.turnUserId||null,turn_number:x.turnNumber||0,round_number:x.roundNumber||1,last_action:x.lastAction||'Ready',winner_user_id:x.winnerUserId||null}}}
+function playerName(){return($('name').value||'Player').trim().slice(0,20)||'Player'}
+function showJoin(){$('joinBox').classList.toggle('hidden');if(!$('joinBox').classList.contains('hidden'))$('code').focus()}
+function showScreen(which){for(const id of ['home','lobby','game'])$(id).classList.toggle('hidden',id!==which)}
+async function createRoom(){try{$('createBtn').disabled=true;const d=await api('create_room',{displayName:playerName(),mode:$('mode').value,maxPlayers:6});room=d.room;await enterLobby();toast('Room created')}catch(e){toast(e.message)}finally{$('createBtn').disabled=false}}
+async function joinRoom(){try{const c=$('code').value.trim().toUpperCase();if(c.length!==6)return toast('Enter the 6-character room code');const d=await api('join_room',{code:c,displayName:playerName()});room=d.room;await enterLobby();toast('Joined room')}catch(e){toast(e.message)}}
+async function enterLobby(){showScreen('lobby');$('roomCode').textContent=room.code;await refreshRoom();subscribe();if(pollTimer)clearInterval(pollTimer);pollTimer=setInterval(async()=>{if(!busy&&room){busy=true;try{await refreshRoom()}catch(e){console.warn(e)}finally{busy=false}}},2000)}
+function subscribe(){if(channel)sb.removeChannel(channel);channel=sb.channel('rummy:'+room.id,{config:{private:true}});channel.on('broadcast',{event:'lobby'},()=>refreshRoom()).on('broadcast',{event:'game_started'},()=>refreshRoom()).on('broadcast',{event:'state'},()=>loadGame()).on('broadcast',{event:'round_result'},()=>loadGame()).subscribe()}
+async function refreshRoom(){if(!room)return;const d=await api('get_state',{roomId:room.id});room=d.room;members=d.members; if(room.status==='playing'||room.status==='finished'){if(pollTimer){clearInterval(pollTimer);pollTimer=null}showScreen('game');await loadGame();return}showScreen('lobby');renderMembers()}
+function renderMembers(){$('players').innerHTML=members.map((p,i)=>`<div class="player">${i+1}. ${esc(p.display_name)} ${p.user_id===room.host_id?'👑':''}</div>`).join('');$('hostStart').classList.toggle('hidden',!(room.host_id===user.id&&members.length>=2));$('startBtn').disabled=!(room.host_id===user.id&&members.length>=2)}
+async function startGame(){try{$('startBtn').disabled=true;await api('start_game',{roomId:room.id});await refreshRoom();toast('Game started')}catch(e){toast(e.message);$('startBtn').disabled=false}}
+async function loadGame(){if(!room)return;try{const d=await api('get_state',{roomId:room.id});room=d.room;members=d.members;state=d.state;myHand=d.hand;discardHistory=[...state.discard_pile];renderGame(d)}catch(e){toast(e.message)}}
+function renderGame(d){showScreen('game');const wc=state.wild_card;const wildRank=state.wild_rank;const wi=$('wildIndicator');if(wc&&wildRank){const sym=suitSymbol(wc.suit);wi.innerHTML='<span>RANDOM WILD</span><span class="wild-card-mini '+(isRed(wc)?'red':'')+'"><b>'+esc(wc.rank)+sym+'</b></span><span>All <b>'+esc(wildRank)+'</b>s are wild</span>'}else{wi.textContent='Random Joker: waiting for round…'}const current=members.find(m=>m.user_id===state.turn_user_id);$('turnText').textContent=room.status==='finished'?'Round finished':state.turn_user_id===user.id?'Your turn':`Waiting for ${current?.display_name||'player'}`;$('count').textContent=`(${myHand.length})`;renderHand();const top=state.discard_pile[state.discard_pile.length-1];$('discardTop').innerHTML=top?cardMarkup(top):'<div class="cardface">−</div>';$('opponents').innerHTML=members.filter(p=>p.user_id!==user.id).map(p=>`<div class="opp"><b>${esc(p.display_name)}</b><div class="backs">${Array(Math.min(13,d.hand_counts[p.user_id]??13)).fill(0).map(()=>'<span class="back"></span>').join('')}</div><small>${d.hand_counts[p.user_id]??13} cards</small></div>`).join('');const me=members.find(p=>p.user_id===user.id);$('selfName').textContent=me?.display_name||'You';$('selfCount').textContent=`${myHand.length} cards`;$('scores').innerHTML=d.scores.map(s=>`<div>${esc(members.find(m=>m.user_id===s.user_id)?.display_name||'Player')}: <b>${s.total_points}</b></div>`).join('');$('gameStatus').textContent=state.last_action||'Ready';const myTurn=state.turn_user_id===user.id&&room.status==='playing'&&!actionBusy;$('deckClick').disabled=!myTurn||myHand.length!==13;$('discardTop').disabled=!myTurn||myHand.length!==13||!state.discard_pile.length;$('discardBtn').disabled=!myTurn||myHand.length!==14||selected===null;$('declareBtn').disabled=!myTurn||myHand.length!==14||selected===null;$('dropBtn').disabled=!myTurn||room.status!=='playing'}
+function selectCard(i){selected=selected===i?null:i;renderHand();const can=state?.turn_user_id===user?.id&&room?.status==='playing'&&myHand.length===14;$('discardBtn').disabled=!can||selected===null;$('declareBtn').disabled=!can||selected===null}
+function renderHand(){
+ const liveIds=new Set(myHand.map(c=>c.id));
+ visualGroups=visualGroups.map(g=>g.filter(id=>liveIds.has(id))).filter(g=>g.length);
+ const grouped=new Set(visualGroups.flat());
+ const card=(c,i)=>'<div role="button" aria-label="'+esc(c.rank)+' '+esc(suitName(c.suit))+'" class="cardface '+(isRed(c)?'red ':'')+(selected===i?'sel ':'')+(groupSelection.has(c.id)?'gsel':'')+'" onclick="handleHandTap('+i+')">'+cardMarkup(c)+'</div>';
+ const chunks=[];
+ visualGroups.forEach((ids,n)=>{const cards=ids.map(id=>{const i=myHand.findIndex(c=>c.id===id);return i<0?'':card(myHand[i],i)}).join('');if(cards)chunks.push('<div class="hand-group" aria-label="Card group '+(n+1)+'">'+cards+'</div>')});
+ myHand.forEach((c,i)=>{if(!grouped.has(c.id))chunks.push(card(c,i))});
+ $('hand').innerHTML=chunks.join('');
+ updateGroupFeedback();
+ $('groupModeBtn').textContent=groupMode?'Done selecting groups':'Select cards to group';
+ $('groupModeBtn').classList.toggle('danger',groupMode);
+}
+function handleHandTap(i){if(groupMode){const id=myHand[i]?.id;if(!id)return;groupSelection.has(id)?groupSelection.delete(id):groupSelection.add(id);renderHand();updateGroupFeedback();return}selectCard(i)}
+function updateGroupFeedback(){const el=$('groupFeedback');if(!groupSelection.size){el.className='group-feedback';el.textContent='Select 3 cards to check a group';return}const cards=[...groupSelection].map(id=>myHand.find(c=>c.id===id)).filter(Boolean);if(cards.length<3){el.className='group-feedback';el.textContent=`${cards.length}/3 cards selected`;return}const valid=isValidGroup(cards);el.className='group-feedback '+(valid?'valid':'invalid');el.textContent=valid?'✓ VALID GROUP':'✕ INVALID GROUP'}
+function toggleGroupMode(){groupMode=!groupMode;groupSelection.clear();renderHand();toast(groupMode?'Tap 3 or more cards, then Group selected':'Card grouping selection closed')}
+function rankValue(r){return ({A:1,J:11,Q:12,K:13})[String(r).toUpperCase()]||Number(r)||0}
+function isWildCard(c){return c?.type==='joker'||String(c?.rank).toUpperCase()==='JOKER'||String(c?.rank)===String(state?.wild_rank||'')}function isValidGroup(cards){if(cards.length<3||cards.length>13)return false;const naturals=cards.filter(c=>!isWildCard(c));const wildCount=cards.length-naturals.length;if(!naturals.length)return false;const sameRank=naturals.every(c=>c.rank===naturals[0].rank)&&new Set(naturals.map(c=>String(c.suit))).size===naturals.length&&cards.length<=4;if(sameRank)return true;const sameSuit=naturals.every(c=>String(c.suit)===String(naturals[0].suit));if(!sameSuit||new Set(naturals.map(c=>rankValue(c.rank))).size!==naturals.length)return false;const vals=naturals.map(c=>rankValue(c.rank)).sort((a,b)=>a-b);if(vals.some(v=>v<1||v>13))return false;let gaps=0;for(let i=1;i<vals.length;i++)gaps+=vals[i]-vals[i-1]-1;return gaps<=wildCount&&cards.length<=13}
+function groupSelected(){const ids=[...groupSelection];if(ids.length<3)return toast('Select at least 3 cards for a group');if(ids.some(id=>visualGroups.some(g=>g.includes(id))))return toast('Ungroup those cards first');const cards=ids.map(id=>myHand.find(c=>c.id===id)).filter(Boolean);if(!isValidGroup(cards))return toast('Invalid group. Use a same-suit sequence or same-rank set.');visualGroups.push(ids);groupSelection.clear();groupMode=false;renderHand();toast('Valid sequence/set grouped')}
+function ungroupSelected(){if(!groupSelection.size)return toast('Select cards from a group first');const before=visualGroups.length;visualGroups=visualGroups.filter(g=>!g.some(id=>groupSelection.has(id)));groupSelection.clear();groupMode=false;renderHand();toast(before===visualGroups.length?'Those cards are not in a group':'Group separated')}
+function autoArrange(){myHand.sort((a,b)=>{const si={S:0,H:1,D:2,C:3};const ri={A:1,J:11,Q:12,K:13};return (si[String(a.suit).toUpperCase()]??9)-(si[String(b.suit).toUpperCase()]??9)||((ri[a.rank]??Number(a.rank))-(ri[b.rank]??Number(b.rank))) });selected=null;visualGroups=[];groupSelection.clear();renderHand();toast('Hand sorted by suit and rank')}
+function suitSymbol(s){return({S:'♠',H:'♥',D:'♦',C:'♣','♠':'♠','♥':'♥','♦':'♦','♣':'♣'})[String(s||'').toUpperCase()]||s||''}
+function suitName(s){return({S:'spades',H:'hearts',D:'diamonds',C:'clubs'})[String(s||'').toUpperCase()]||String(s||'')}
+function isRed(c){const s=String(c.suit||'').toUpperCase();return s==='H'||s==='D'||s==='♥'||s==='♦'}
+function cardMarkup(c){const rank=String(c.rank||'');const suit=suitSymbol(c.suit);if(c.type==='joker'||rank.toUpperCase()==='JOKER')return '<span class="joker-face"><span class="joker-star">★</span><b>JOKER</b><small>WILD</small></span>';const corner=`<span class="corner"><span>${esc(rank)}</span><span class="corner-suit">${suit}</span></span><span class="corner bottom"><span>${esc(rank)}</span><span class="corner-suit">${suit}</span></span>`;if(['J','Q','K'].includes(rank)){const icon=rank==='K'?'♚':rank==='Q'?'♛':'⚔';return `${corner}<span class="face-art"><span>${icon}</span></span>`}const count=rank==='A'?1:Math.max(2,Math.min(10,Number(rank)||2));const layouts={1:[[2,2]],2:[[2,1],[2,4]],3:[[2,1],[2,2],[2,4]],4:[[1,1],[3,1],[1,4],[3,4]],5:[[1,1],[3,1],[2,2],[1,4],[3,4]],6:[[1,1],[3,1],[1,2],[3,2],[1,4],[3,4]],7:[[1,1],[3,1],[2,2],[1,3],[3,3],[1,4],[3,4]],8:[[1,1],[3,1],[1,2],[3,2],[1,3],[3,3],[1,4],[3,4]],9:[[1,1],[3,1],[1,2],[2,2],[3,2],[1,3],[2,3],[3,3],[1,4]],10:[[1,1],[3,1],[1,2],[3,2],[2,2],[1,3],[3,3],[1,4],[2,4],[3,4]]};const spots=layouts[count]||layouts[2];return `${corner}<span class="pipfield">${spots.map(([col,row],i)=>`<span class="pip ${i%2?'flip':''}" style="grid-column:${col};grid-row:${row}">${suit}</span>`).join('')}</span>`}
+function cardText(c){return c.type==='joker'||String(c.rank).toUpperCase()==='JOKER'?'JOKER':`${c.rank}${suitSymbol(c.suit)}`}
+async function gameAction(action,extra={}){if(actionBusy)return;actionBusy=true;for(const id of ['deckClick','discardTop','discardBtn','dropBtn','declareBtn'])$(id).disabled=true;$('gameStatus').textContent='Processing '+action.replaceAll('_',' ')+'…';try{const d=await api(action,{roomId:room.id,...extra});selected=null;groupSelection.clear();await loadGame();toast(({draw:'Card drawn',take_discard:'Discard picked up',discard:'Card discarded',drop:'Drop recorded'})[action]||'Action completed');return d}catch(e){toast('Action failed: '+e.message);console.error('Rummy action failed',action,e);return null}finally{actionBusy=false;if(room)await loadGame()}}
+async function drawCard(){await gameAction('draw')}async function takeDiscard(){await gameAction('take_discard')}async function discardSelected(){if(selected===null)return toast('Tap one card first to select it');await gameAction('discard',{cardId:myHand[selected]?.id})}async function declareGame(){if(selected===null)return toast('Tap one card first to select it');if(actionBusy)return;actionBusy=true;for(const id of ['deckClick','discardTop','discardBtn','dropBtn','declareBtn'])$(id).disabled=true;try{const d=await api('declare',{roomId:room.id,cardId:myHand[selected]?.id});selected=null;visualGroups=d.result?.groups?.map(g=>g.cards.map(c=>c.id))||[];await loadGame();toast(d.valid?'VALID SHOW • 0 POINTS':'INVALID SHOW • 80 POINTS')}catch(e){toast('Declare failed: '+e.message);console.error(e)}finally{actionBusy=false;if(room)await loadGame()}}
+async function dropGame(){if(!confirm('Drop this round for 25 points?'))return;await gameAction('drop')}
+function showHistory(){alert('Discard history\n\n'+discardHistory.map((c,i)=>`${i+1}. ${cardText(c)}`).join('\n'))}
+function shareRoom(){const text=`Join my Friends Rummy room at https://candlelogic2026-ai.github.io/friends-rummy/friends-rummy-game.html\nRoom code: ${room.code}`;location.href=`https://wa.me/?text=${encodeURIComponent(text)}`}
+function leaveRoom(){if(channel)sb.removeChannel(channel);if(pollTimer)clearInterval(pollTimer);room=null;members=[];state=null;myHand=[];selected=null;showScreen('home')}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+init();
+</script></body></html>
