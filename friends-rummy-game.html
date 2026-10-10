@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Friends Rummy Online</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07131d;color:#eef7f3;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:900px;margin:auto;padding:16px}.card{background:#10232e;border:1px solid #25414d;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 10px 30px #0004}
+h1,h2{margin:4px 0 12px}.muted{color:#9bb0b8}.row{display:flex;gap:10px;flex-wrap:wrap}.grow{flex:1}
+input,select,button{width:100%;padding:13px;border-radius:12px;border:1px solid #385461;background:#091a24;color:#fff;font-size:16px}
+button{background:#1f8f68;border:0;font-weight:700;cursor:pointer}.secondary{background:#24404d}.danger{background:#b94343}.small{width:auto;padding:9px 12px}
+.hidden{display:none}.roomcode{font-size:30px;font-weight:900;letter-spacing:7px;text-align:center;color:#7ee2bb}
+.players{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.player{padding:10px;border-radius:12px;background:#0a1b25;border:1px solid #29434d}
+.table{background:#0b402f;border-radius:24px;padding:16px;border:6px solid #173d36;min-height:330px}
+.opponents{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.opp{text-align:center}.backs{display:flex;justify-content:center}.back{width:30px;height:44px;border-radius:5px;background:#284f87;border:2px solid #b7d3e8;margin-left:-12px}
+.center{text-align:center;margin:15px 0}.discard{font-size:34px;background:#eee;color:#111;border-radius:8px;display:inline-block;padding:8px 12px;min-width:55px}
+.hand{display:flex;gap:5px;overflow-x:auto;padding:10px 2px}.cardface{flex:0 0 48px;height:68px;background:#fff;color:#111;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;border:3px solid transparent;cursor:pointer}
+.cardface.sel{border-color:#20d49b;transform:translateY(-6px)}.red{color:#c62828}.status{padding:10px;border-radius:12px;background:#0b1b25}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#000d;padding:12px 18px;border-radius:12px;display:none;z-index:20}
+@media(max-width:560px){.wrap{padding:10px}.opponents{grid-template-columns:repeat(2,1fr)}.cardface{flex-basis:45px}}
+</style>
+</head>
+<body><div class="wrap">
+<div id="home" class="card">
+<h1>🃏 Friends Rummy</h1><p class="muted">Free-to-play private rooms. 2 to 6 friends.</p>
+<input id="name" placeholder="Your player name" maxlength="20">
+<select id="mode"><option value="201_points">201 Points</option><option value="hand_to_hand">Hand-to-Hand</option><option value="single_table">Single Table</option></select>
+<div class="row" style="margin-top:10px"><button class="grow" onclick="createRoom()">Create Room</button><button class="grow secondary" onclick="showJoin()">Join Room</button></div>
+<div id="joinBox" class="hidden" style="margin-top:10px"><input id="code" placeholder="6-character room code" maxlength="6" style="text-transform:uppercase"><button onclick="joinRoom()" style="margin-top:8px">Join</button></div>
+</div>
+
+<div id="lobby" class="card hidden">
+<h2>Waiting Room</h2><div class="roomcode" id="roomCode"></div>
+<button onclick="shareRoom()" style="margin:10px 0">📲 Share on WhatsApp</button>
+<div class="players" id="players"></div>
+<div id="hostStart" class="hidden" style="margin-top:12px"><button onclick="startGame()">Start Game</button></div>
+<p class="muted">Minimum 2 players. Maximum 6.</p>
+</div>
+
+<div id="game" class="hidden">
+<div class="card"><div class="row"><div class="grow"><b id="turnText">Loading...</b></div><button class="small secondary" onclick="leaveRoom()">Leave</button></div></div>
+<div class="table">
+<div class="opponents" id="opponents"></div>
+<div class="center"><div class="muted">Discard pile</div><div id="discardTop" class="discard">-</div><div><button class="small secondary" onclick="showHistory()">View discard history</button></div></div>
+<div id="gameStatus" class="status"></div>
+</div>
+<div class="card"><h3>Your hand <span id="count"></span></h3><div id="hand" class="hand"></div>
+<div class="row"><button class="grow" onclick="drawCard()">Draw</button><button class="grow secondary" onclick="takeDiscard()">Take Discard</button></div>
+<div class="row" style="margin-top:8px"><button class="grow" onclick="discardSelected()">Discard Selected</button><button class="grow danger" onclick="dropGame()">Drop 25</button><button class="grow" onclick="declareGame()">Declare</button></div>
+<p class="muted">After drawing you have 14 cards. Select one card. Declare will automatically discard that selected card and check your remaining 13.</p>
+</div>
+<div class="card"><h3>Scores</h3><div id="scores"></div></div>
+</div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const SUPABASE_URL='https://pburscyfhjpwtehfpvap.supabase.co';
+const KEY='sb_publishable_YAaKOGT8nW1z8uPK-jDquA_HYhFQyH-';
+const sb=supabase.createClient(SUPABASE_URL,KEY);
+const FN='rummy-game';
+let session,user,room,members=[],state=null,myHand=[],selected=null,channel=null;
+
+const $=id=>document.getElementById(id);
+function toast(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2500)}
+async function init(){
+ try {
+  let result=await sb.auth.getSession(); if(result.error) throw result.error;
+  let s=result.data.session;
+  if(!s){let r=await sb.auth.signInAnonymously();if(r.error) throw r.error;s=r.data.session}
+  session=s;user=s.user; await sb.realtime.setAuth(s.access_token);
+ } catch(e) { toast('Sign-in failed: '+(e.message||e)); console.error(e); }
+}
+async function api(action,extra={}){
+ if(!user) throw new Error('Connecting to the game server. Please wait a moment and try again.');
+ const body={action};
+ if(extra.display_name!==undefined) body.displayName=extra.display_name;
+ if(extra.mode!==undefined) body.mode=extra.mode;
+ if(extra.max_players!==undefined) body.maxPlayers=extra.max_players;
+ if(extra.code!==undefined) body.code=extra.code;
+ if(extra.room_id!==undefined) body.roomId=extra.room_id;
+ if(extra.card_index!==undefined){
+   const card=myHand[extra.card_index];
+   if(!card) throw new Error('Select a card first.');
+   body.cardId=card.id;
+ }
+ const r=await sb.functions.invoke(FN,{body});
+ if(r.error) throw new Error(r.error.message||'Could not contact the game server.');
+ const raw=r.data||{};
+ if(raw.error) throw new Error(raw.error);
+ if(raw.ok===false) throw new Error(raw.error||'The request failed.');
+ const x=raw.state||raw;
+ const normalized={
+   room:x.room, members:x.members||[], scores:x.scores||[], hand:x.hand||[],
+   hand_counts:x.handCounts||{}, valid:raw.result?.valid, result:raw.result,
+   state:{
+     discard_pile:x.discardPile||[], wild_rank:x.wildRank||null,
+     turn_user_id:x.turnUserId||null, turn_number:x.turnNumber||0,
+     round_number:x.roundNumber||1, last_action:x.lastAction||'Ready',
+     winner_user_id:x.winnerUserId||null
+   }
+ };
+ return normalized;
+}
+function name(){return ($('name').value||'Player').trim().slice(0,20)||'Player'}
+function showJoin(){$('joinBox').classList.toggle('hidden')}
+async function createRoom(){
+ try{let d=await api('create_room',{display_name:name(),mode:$('mode').value,max_players:6}); room=d.room; await enterLobby(); toast('Room created')}
+ catch(e){toast(e.message)}
+}
+async function joinRoom(){
+ try{let c=$('code').value.trim().toUpperCase();if(c.length!==6)return toast('Enter 6 characters');let d=await api('join_room',{code:c,display_name:name()});room=d.room;await enterLobby();toast('Joined room')}
+ catch(e){toast(e.message)}
+}
+async function enterLobby(){
+ $('home').classList.add('hidden');$('lobby').classList.remove('hidden');$('roomCode').textContent=room.code;
+ await refresh(); subscribe();
+}
+function subscribe(){
+ if(channel)sb.removeChannel(channel);
+ channel=sb.channel('rummy:'+room.id,{config:{private:true}});
+ channel.on('broadcast',{event:'lobby'},refresh).on('broadcast',{event:'game_started'},async()=>{await refresh();await loadState()})
+ .on('broadcast',{event:'state'},loadState).on('broadcast',{event:'round_result'},loadState).subscribe();
+}
+async function refresh(){
+ try{
+  let d=await api('get_state',{room_id:room.id});room=d.room;members=d.members||[];
+  if(room.status==='playing'||room.status==='finished'){$('lobby').classList.add('hidden');$('game').classList.remove('hidden');renderMembers();await loadState();return}
+  renderMembers();
+ }catch(e){toast(e.message)}
+}
+function renderMembers(){
+ $('players').innerHTML=members.map((p,i)=>`<div class="player">${i+1}. ${esc(p.display_name)} ${p.user_id===room.host_id?'👑':''}</div>`).join('');
+ $('hostStart').classList.toggle('hidden',!(room.host_id===user.id&&members.length>=2));
+}
+async function startGame(){try{await api('start_game',{room_id:room.id});await refresh();toast('Game started')}catch(e){toast(e.message)}}
+async function loadState(){
+ try{let d=await api('get_state',{room_id:room.id});room=d.room;members=d.members||[];state=d.state;renderGame(d);if(room.status==='finished')toast('Round finished')}catch(e){toast(e.message)}
+}
+function renderGame(d){
+ $('game').classList.remove('hidden');$('lobby').classList.add('hidden');
+ $('turnText').textContent=room.status==='finished'?'Round finished':(state.turn_user_id===user.id?'Your turn':'Waiting for '+(members.find(x=>x.user_id===state.turn_user_id)?.display_name||'player'));
+ myHand=d.hand||[];selected=null;$('count').textContent='('+myHand.length+')';
+ renderHand();
+ $('discardTop').textContent=state.discard_pile?.length?cardText(state.discard_pile[state.discard_pile.length-1]):'-';
+ $('opponents').innerHTML=members.filter(p=>p.user_id!==user.id).map(p=>`<div class="opp"><b>${esc(p.display_name)}</b><div class="backs">${Array(Math.min(13,(d.hand_counts?.[p.user_id]||13))).fill(0).map(()=>'<span class="back"></span>').join('')}</div></div>`).join('');
+ $('scores').innerHTML=(d.scores||[]).map(s=>`<div>${esc(members.find(m=>m.user_id===s.user_id)?.display_name||'Player')}: <b>${s.total_points}</b></div>`).join('');
+ $('gameStatus').textContent=state.last_action||'Ready';
+}
+function selectCard(i){selected=i;renderHand()}
+function renderHand(){let h=myHand||[];$('hand').innerHTML=h.map((c,i)=>`<div class="cardface ${selected===i?'sel':''} ${isRed(c)?'red':''}" onclick="selectCard(${i})">${cardText(c)}</div>`).join('')}
+function cardText(c){return (c.rank||'')+(c.suit||'')}
+function isRed(c){return c.suit==='♥'||c.suit==='♦'}
+async function drawCard(){try{await api('draw',{room_id:room.id});await loadState()}catch(e){toast(e.message)}}
+async function takeDiscard(){try{await api('take_discard',{room_id:room.id});await loadState()}catch(e){toast(e.message)}}
+async function discardSelected(){if(selected===null)return toast('Select a card');try{await api('discard',{room_id:room.id,card_index:selected});selected=null;await loadState()}catch(e){toast(e.message)}}
+async function declareGame(){if(selected===null)return toast('Select the card to discard for declaration');try{let d=await api('declare',{room_id:room.id,card_index:selected});selected=null;await loadState();toast(d.valid?'VALID SHOW • 0 POINTS':'INVALID SHOW • 80 POINTS')}catch(e){toast(e.message)}}
+async function dropGame(){try{await api('drop',{room_id:room.id});await loadState()}catch(e){toast(e.message)}}
+function showHistory(){let a=state?.discard_pile||[];alert('Discard history\\n\\n'+a.map((c,i)=>(i+1)+'. '+cardText(c)).join('\\n'))}
+function shareRoom(){let text=`Join my Friends Rummy room: ${room.code}`;let url=`https://wa.me/?text=${encodeURIComponent(text)}`;location.href=url}
+function leaveRoom(){location.reload()}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+init().catch(e=>toast(e.message));
+</script>
+</body></html>
