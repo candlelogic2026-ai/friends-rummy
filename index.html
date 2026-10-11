@@ -817,7 +817,13 @@ function removeOpponentCardBacks(){
    el.setAttribute('aria-hidden','true');
  });
 }
-function applyRummyState(st){
+function applyRummyState(st){const wildBox = document.getElementById('wildIndicator');
+const wildLabel = document.getElementById('wildRankLabel');
+
+if (wildBox && wildLabel) {
+  wildBox.style.display = st.wildRank ? 'block' : 'none';
+  wildLabel.textContent = st.wildRank || '';
+}
  removeOpponentCardBacks();
  rummyState=st;rummyRoomId=st.room.id;rummyHostId=st.room.host_id;
  document.getElementById('lobbyRoomInfo').style.display='block';
