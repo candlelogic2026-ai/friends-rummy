@@ -322,7 +322,12 @@ button{border:0;color:#fff;border-radius:9px;padding:11px 13px;font-weight:bold;
  <div class="rail"></div><div class="frame"></div>
  <div class="logo">♠ FRIENDS RUMMY</div><div class="mode">201 POINTS</div>
 
- <div class="center">
+<div class="center">
+  <div id="wildIndicator" style="display:none;min-width:48px;padding:5px;border:2px solid #d49a48;border-radius:7px;background:#123524;color:white;text-align:center;font-weight:bold">
+    <div style="font-size:10px">WILD</div>
+    <div id="wildRankLabel" style="font-size:23px"></div>
+    <div style="font-size:10px">♠ ♥ ♦ ♣</div>
+  </div>
   <div class="deck" onclick="drawCard()">R</div>
   <div class="discard" id="discard">3♥</div>
    <div class="discard-history" id="discardHistory">
