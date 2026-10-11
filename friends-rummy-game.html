@@ -96,6 +96,14 @@ body{background:#11151a;background-image:radial-gradient(ellipse at 50% 35%,#2b3
 @media(max-width:560px){.hand{overflow-x:auto;align-items:stretch;padding-top:20px}.hand-group{padding:4px!important}.hand-group:before{font-size:9px;top:-16px}.cardface{flex-basis:46px;height:72px}}
 
 </style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#08783f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Friends Rummy">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body><main class="wrap">
 <section id="home" class="panel">
@@ -196,4 +204,10 @@ function shareRoom(){const text=`Join my Friends Rummy room at https://candlelog
 function leaveRoom(){if(channel)sb.removeChannel(channel);if(pollTimer)clearInterval(pollTimer);room=null;members=[];state=null;myHand=[];selected=null;showScreen('home')}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 init();
-</script></body></html>
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(err => console.warn('PWA service worker registration failed', err)); });
+}
+</script>
+</body></html>
