@@ -1152,5 +1152,120 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigato
 })();
 </script>
 
+<!-- FRIENDS RUMMY INSTALL APP POPUP -->
+<style>
+#installAppPopup {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0,0,0,.75);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#installAppPopup .install-card {
+  width: 100%;
+  max-width: 340px;
+  background: #123524;
+  color: white;
+  border: 2px solid #d49a48;
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 12px 40px #0009;
+  font-family: Arial, sans-serif;
+}
+#installAppPopup .install-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+#installAppPopup h2 {
+  margin: 5px 0 10px;
+}
+#installAppPopup p {
+  color: #ccebd5;
+  font-size: 14px;
+  line-height: 1.5;
+}
+#installAppPopup button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 13px;
+  border: 0;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 15px;
+}
+#installNowBtn {
+  background: #d49a48;
+  color: #172319;
+}
+#installLaterBtn {
+  background: #284b38;
+  color: white;
+}
+</style>
+
+<div id="installAppPopup">
+  <div class="install-card">
+    <div class="install-icon">♠️</div>
+    <h2>Install Friends Rummy</h2>
+    <p>Get quick access to your favourite rummy table from your phone's home screen.</p>
+    <button id="installNowBtn">INSTALL APP</button>
+    <button id="installLaterBtn">MAYBE LATER</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  let installPrompt = null;
+  const popup = document.getElementById('installAppPopup');
+  const installBtn = document.getElementById('installNowBtn');
+  const laterBtn = document.getElementById('installLaterBtn');
+
+  if (!popup || !installBtn || !laterBtn) return;
+
+  if (window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true) return;
+
+  let dismissed = false;
+  try {
+    dismissed = sessionStorage.getItem('rummyInstallDismissed') === 'yes';
+  } catch (e) {}
+
+  if (dismissed) return;
+
+  window.addEventListener('beforeinstallprompt', function (event) {
+    event.preventDefault();
+    installPrompt = event;
+    popup.style.display = 'flex';
+  });
+
+  laterBtn.addEventListener('click', function () {
+    popup.style.display = 'none';
+    try {
+      sessionStorage.setItem('rummyInstallDismissed', 'yes');
+    } catch (e) {}
+  });
+
+  installBtn.addEventListener('click', async function () {
+    if (installPrompt) {
+      installPrompt.prompt();
+      await installPrompt.userChoice;
+      installPrompt = null;
+      popup.style.display = 'none';
+    } else {
+      alert('To install: open your browser menu and choose "Install app" or "Add to Home screen".');
+    }
+  });
+
+  window.addEventListener('appinstalled', function () {
+    popup.style.display = 'none';
+  });
+})();
+</script>
+<!-- END FRIENDS RUMMY INSTALL APP POPUP -->
+
 </body>
 </html>
