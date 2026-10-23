@@ -523,6 +523,15 @@ function makeCard(c){
  return d;
 }
 function render(){
+ const dropButton = document.querySelector('.actions .drop');
+ if (dropButton) {
+   const canDrop = totalCards() === 13;
+   dropButton.disabled = !canDrop;
+   dropButton.title = canDrop
+     ? 'Drop before drawing a card'
+     : 'Drop is available only with exactly 13 cards';
+ }
+
  const h=document.getElementById('hand');h.innerHTML='';
  groups.forEach((g,i)=>{
   const box=document.createElement('div');
